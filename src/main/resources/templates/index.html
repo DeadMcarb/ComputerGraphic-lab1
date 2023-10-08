@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Графік функції</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0-alpha2/dist/css/bootstrap.css}">
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <label class="btn btn-dark myChip" style="width: auto;">y = tg x² / ( x² + 1)</label>
+    <div class="input">
+        <div class="left-block">
+
+
+            <label for="x">Значення x:</label>
+            <input type="number" id="x" value="10" class="btn btn-dark myChip"><br />
+
+            <label for="step">Крок:</label>
+            <input type="number" id="step" value="0.1" step="0.01" min="0.001" class="btn btn-dark myChip"><br />
+
+            <label for="a">Від</label>
+            <input type="number" id="a" value="0" class="btn btn-dark myChip"><br />
+
+            <label for="b">До</label>
+            <input type="number" id="b" value="1.4" class="btn btn-dark myChip">
+        </div>
+
+
+
+            <label for="yMin">Нижня границя координат</label>
+            <input type="number" id="yMin" value="-10" class="btn btn-dark myChip"><br />
+
+            <label for="yMax">Нижня границя координат</label>
+            <input type="number" id="yMax" value="10" class="btn btn-dark myChip"><br />
+
+            <label for="decimalPlaces">Знаків після коми</label>
+            <input type="number" id="decimalPlaces" value="2" min="1" class="btn btn-dark myChip">
+
+
+        <button onclick="calculateGraph()" class="btn btn-dark myBtn">Побудувати графік</button>
+    </div>
+
+
+
+    <div class="graph">
+        <p><span id="result"></span></p>
+        <canvas id="graphCanvas"></canvas>
+    </div>
+
+    <script>
+
+
+
+        var chart;
+
+        function calculateGraph() {
+            var a = parseFloat(document.getElementById("a").value);
+            var b = parseFloat(document.getElementById("b").value);
+            var step = parseFloat(document.getElementById("step").value);
+            var decimalPlaces = parseInt(document.getElementById("decimalPlaces").value);
+            var yMin = parseFloat(document.getElementById("yMin").value);
+            var yMax = parseFloat(document.getElementById("yMax").value);
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            var xValues = [];
+            var yValues = [];
+
+            for (var x = a; x <= b; x += step) {
+                x = Number(x.toFixed(decimalPlaces));
+                xValues.push(x);
+                var result = calculateFunction(x);
+                result = Math.max(yMin, Math.min(yMax, result));
+                yValues.push(result);
+            }
+
+            var ctx = document.getElementById('graphCanvas').getContext('2d');
+            var data = {
+                labels: xValues,
+                datasets: [{
+                    label: 'y',
+                    borderColor: '#a7a8a3',
+                    borderWidth: 1.0,
+                    data: yValues,
+                }]
+            };
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        },
+                        y: {
+                            min: yMin,
+                            max: yMax,
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateFunction(x) {
+            var firstHalf = Math.tan(x*x);
+            var secondHalf =  x * x + 1;
+            return firstHalf / secondHalf;
+        }
+    </script>
+</div>
+</body>
+</html>
